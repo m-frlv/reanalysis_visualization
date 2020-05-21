@@ -30,6 +30,7 @@ from qgis.PyQt.QtWidgets import QAction
 from .resources import *
 # Import the code for the dialog
 from .reanalysis_visualization_dialog import ReanalysisVisualizationDialog
+from .isolines import Isolines
 import os.path
 
 
@@ -196,6 +197,9 @@ class ReanalysisVisualization:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+            csv_path = self.dlg.mQgsFileWidget.filePath()
+            if (csv_path):
+                Isolines(csv_path)
+
+                
+                
