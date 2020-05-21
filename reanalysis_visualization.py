@@ -32,7 +32,7 @@ from .resources import *
 from .reanalysis_visualization_dialog import ReanalysisVisualizationDialog
 from .isolines import Isolines
 import os.path
-from qgis.core import QgsVectorLayer, QgsProject
+from qgis.core import QgsVectorLayer, QgsProject, QgsProperty, QgsSymbolLayer
 
 
 class ReanalysisVisualization:
@@ -200,9 +200,16 @@ class ReanalysisVisualization:
         if result:
             csv_path = self.dlg.mQgsFileWidget.filePath()
             if (csv_path):
+                #add vector layer with isolines
                 geojson = Isolines(csv_path).get_geojson()
-                vl = QgsVectorLayer(geojson,"mygeojson","ogr")
-                QgsProject.instance().addMapLayer(vl)
+                layer = QgsVectorLayer(geojson,"mygeojson","ogr")
+                QgsProject.instance().addMapLayer(layer)
+
+                #apply contour styling properties
+                symbol_layer = layer.renderer().symbol().symbolLayers()[0]
+                symbol_layer.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("stroke"))
+                symbol_layer.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeWidth, QgsProperty.fromField("stroke-width"))
+                layer.triggerRepaint()
 
                 
                 
