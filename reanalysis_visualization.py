@@ -199,7 +199,7 @@ class ReanalysisVisualization:
         if result:
             csv_path = self.dlg.mQgsFileWidget.filePath()
             if (csv_path):
-                Isolines(csv_path)
+                print(Isolines(csv_path).get_geojson())
 
                 
                 
