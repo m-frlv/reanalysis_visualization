@@ -3,6 +3,7 @@ import numpy as np
 import pylab
 import matplotlib.colors as colours
 import geojsoncontour
+from scipy.ndimage.filters import gaussian_filter
 
 
 class Isolines(object):
@@ -17,6 +18,8 @@ class Isolines(object):
 
         Z = contour_data.pivot_table(
             index='lon', columns='lat', values='val').T.values
+        sigma = 1
+        Z = gaussian_filter(Z, sigma)
 
         X_unique = np.sort(contour_data.lon.unique())
         Y_unique = np.sort(contour_data.lat.unique())
