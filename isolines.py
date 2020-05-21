@@ -18,7 +18,6 @@ class Isolines(object):
         X_unique = np.sort(contour_data.lon.unique())
         Y_unique = np.sort(contour_data.lat.unique())
         X, Y = np.meshgrid(X_unique, Y_unique)
-        print(Z)
         return X, Y, Z
 
     def __calculate_isolines(self):
