@@ -5,8 +5,7 @@
 [general]
 name=ReanalysisVisualization
 qgisMinimumVersion=3.0
-description=This plugin is for downloading and visualisation 
-archived hydrometeorological data
+description=This plugin is for downloading and visualisation archived hydrometeorological data
 version=0.1
 author=Frolov Mikhail
 email=mishanya666666@gmail.com
