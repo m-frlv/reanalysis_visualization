@@ -32,8 +32,7 @@ from .resources import *
 from .reanalysis_visualization_dialog import ReanalysisVisualizationDialog
 from .isolines import Isolines
 import os.path
-from qgis.core import QgsVectorLayer, QgsProject, QgsProperty, QgsSymbolLayer
-
+from qgis.core import QgsVectorLayer, QgsProject, QgsProperty, QgsSymbolLayer, QgsPalLayerSettings, QgsVectorLayerSimpleLabeling
 
 class ReanalysisVisualization:
     """QGIS Plugin Implementation."""
@@ -199,15 +198,26 @@ class ReanalysisVisualization:
         if result:
             csv_path = self.dlg.mQgsFileWidget.filePath()
             if (csv_path):
-                #add vector layer with isolines
                 geojson = Isolines(csv_path).get_geojson()
                 layer = QgsVectorLayer(geojson, "mygeojson", "ogr")
-                QgsProject.instance().addMapLayer(layer)
 
-                #apply contour styling properties
+                # add labels
+                pal_layer = QgsPalLayerSettings()
+                pal_layer.fieldName = 'title'
+                pal_layer.enabled = True
+                pal_layer.placement = QgsPalLayerSettings.Curved
+
+                labeler = QgsVectorLayerSimpleLabeling(pal_layer)
+
+                layer.setLabeling(labeler)
+                layer.setLabelsEnabled(True)
+
+                # apply contour style properties
                 symbol_layer = layer.renderer().symbol().symbolLayers()[0]
                 symbol_layer.setDataDefinedProperty(
                     QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("stroke"))
                 symbol_layer.setDataDefinedProperty(
                     QgsSymbolLayer.PropertyStrokeWidth, QgsProperty.fromField("stroke-width"))
-                layer.triggerRepaint()
+
+                # add vector layer with isolines
+                QgsProject.instance().addMapLayer(layer)
