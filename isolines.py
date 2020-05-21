@@ -28,8 +28,9 @@ class Isolines(object):
 
     def __calculate_isolines(self):
         X, Y, Z = self.__prepare_data()
-        contour = pylab.contour(X, Y, Z, cmap=self.__create_colourmap())
+        contour = pylab.contour(
+            X, Y, Z, cmap=self.__create_colourmap())
         return contour
 
     def get_geojson(self):
-        return geojsoncontour.contour_to_geojson(self.__calculate_isolines())
+        return geojsoncontour.contour_to_geojson(self.__calculate_isolines(), stroke_width=0.5)
