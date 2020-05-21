@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
 import pylab
+import matplotlib.colors as colours
 import geojsoncontour
 
 
 class Isolines(object):
+    base_colours = ['#3339e8', '#f54b42']
+
     def __init__(self, csv_path):
         self.__csv_path = csv_path
 
@@ -20,9 +23,12 @@ class Isolines(object):
         X, Y = np.meshgrid(X_unique, Y_unique)
         return X, Y, Z
 
+    def __create_colourmap(self):
+        return colours.LinearSegmentedColormap.from_list('custom colourmap', self.base_colours, N=256)
+
     def __calculate_isolines(self):
         X, Y, Z = self.__prepare_data()
-        contour = pylab.contour(X, Y, Z)
+        contour = pylab.contour(X, Y, Z, cmap=self.__create_colourmap())
         return contour
 
     def get_geojson(self):
