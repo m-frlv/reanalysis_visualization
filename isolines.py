@@ -23,7 +23,6 @@ class Isolines(object):
     def __calculate_isolines(self):
         X, Y, Z = self.__prepare_data()
         contour = pylab.contour(X, Y, Z)
-        pylab.clabel(contour, fmt='x=%.2f')
         return contour
 
     def get_geojson(self):
