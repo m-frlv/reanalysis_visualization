@@ -182,7 +182,6 @@ class ReanalysisVisualization:
                 action)
             self.iface.removeToolBarIcon(action)
 
-
     def run(self):
         """Run method that performs all the real work"""
 
@@ -202,14 +201,13 @@ class ReanalysisVisualization:
             if (csv_path):
                 #add vector layer with isolines
                 geojson = Isolines(csv_path).get_geojson()
-                layer = QgsVectorLayer(geojson,"mygeojson","ogr")
+                layer = QgsVectorLayer(geojson, "mygeojson", "ogr")
                 QgsProject.instance().addMapLayer(layer)
 
                 #apply contour styling properties
                 symbol_layer = layer.renderer().symbol().symbolLayers()[0]
-                symbol_layer.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("stroke"))
-                symbol_layer.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeWidth, QgsProperty.fromField("stroke-width"))
+                symbol_layer.setDataDefinedProperty(
+                    QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("stroke"))
+                symbol_layer.setDataDefinedProperty(
+                    QgsSymbolLayer.PropertyStrokeWidth, QgsProperty.fromField("stroke-width"))
                 layer.triggerRepaint()
-
-                
-                
