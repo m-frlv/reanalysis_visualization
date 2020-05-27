@@ -206,6 +206,7 @@ class ReanalysisVisualization:
                 pal_layer.fieldName = 'title'
                 pal_layer.enabled = True
                 pal_layer.placement = QgsPalLayerSettings.Curved
+                pal_layer.placementFlags = QgsPalLayerSettings.OnLine
 
                 labeler = QgsVectorLayerSimpleLabeling(pal_layer)
 
