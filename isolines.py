@@ -1,39 +1,32 @@
-import pandas as pd
-import numpy as np
 import pylab
 import matplotlib.colors as colours
 import geojsoncontour
-from scipy.ndimage.filters import gaussian_filter
 
 
 class Isolines(object):
     base_colours = ['#3339e8', '#f54b42']
 
-    def __init__(self, csv_path):
-        self.__csv_path = csv_path
-
-    def __prepare_data(self):
-        contour_data = pd.read_csv(self.__csv_path, sep=';')
-        contour_data.head()
-
-        Z = contour_data.pivot_table(
-            index='lon', columns='lat', values='val').T.values
-        sigma = 1
-        Z = gaussian_filter(Z, sigma)
-
-        X_unique = np.sort(contour_data.lon.unique())
-        Y_unique = np.sort(contour_data.lat.unique())
-        X, Y = np.meshgrid(X_unique, Y_unique)
-        return X, Y, Z
+    def __init__(self, datagrid, method):
+        self.__datagrid = datagrid
+        self.__method = method
 
     def __create_colourmap(self):
         return colours.LinearSegmentedColormap.from_list('custom colourmap', self.base_colours, N=256)
 
     def __calculate_isolines(self):
-        X, Y, Z = self.__prepare_data()
+        X, Y, Z = self.__datagrid.get_data_grid()
+        contour = pylab.contour(
+            X, Y, Z, cmap=self.__create_colourmap())
+        return contour
+
+    def __calculate_filled_contour(self):
+        X, Y, Z = self.__datagrid.get_data_grid()
         contourf = pylab.contourf(
             X, Y, Z, cmap=self.__create_colourmap())
         return contourf
 
     def get_geojson(self):
-        return geojsoncontour.contourf_to_geojson(self.__calculate_isolines(), stroke_width=0.5)
+        if self.__method == 'Изолинии':
+            return geojsoncontour.contour_to_geojson(self.__calculate_isolines(), stroke_width=0.5)
+        if self.__method == 'Контур с подписями':
+            return geojsoncontour.contourf_to_geojson(self.__calculate_filled_contour(), stroke_width=0.5)

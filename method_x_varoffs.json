@@ -1,0 +1,208 @@
+{
+  "Ближайший узел GFS 0.25": {
+    "id": 112,
+    "leadTimes": {
+      "0": {
+        "min": 0,
+        "max": 120,
+        "step": 1
+      },
+      "6": {
+        "min": 0,
+        "max": 120,
+        "step": 1
+      },
+      "12": {
+        "min": 0,
+        "max": 120,
+        "step": 1
+      },
+      "18": {
+        "min": 0,
+        "max": 120,
+        "step": 1
+      }
+    },
+    "varoffs": {
+      "Температура воздуха, °C": {
+        "offsetTypeId": 100,
+        "offsetValue": 2,
+        "variableId": 1300
+      },
+      "Скорость ветра, U-компонента, м/с": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1232
+      },
+      "Скорость ветра, V-компонента, м/с": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1419
+      },
+      "Скорость ветра, м/с": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1333
+      },
+      "Давление  на уровне моря": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1238
+      },
+      "Осадки (мм/час)": {
+        "offsetTypeId": 102,
+        "offsetValue": 0,
+        "variableId": 1250
+      },
+      "Температура поверхности моря, °C": {
+        "offsetTypeId": 102,
+        "offsetValue": 0,
+        "variableId": 1311
+      },
+      "Горизонтальная видимость, км": {
+        "offsetTypeId": 0,
+        "offsetValue": 0,
+        "variableId": 1339
+      },
+      "Относ. влажность, %": {
+        "offsetTypeId": 100,
+        "offsetValue": 2,
+        "variableId": 1352
+      },
+      "Скорость ветра в порыве, в срок, м/с": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1374
+      },
+      "Осадки (мм/3ч)": {
+        "offsetTypeId": 102,
+        "offsetValue": 0,
+        "variableId": 1390
+      },
+      "Облачность, %": {
+        "offsetTypeId": 108,
+        "offsetValue": 0,
+        "variableId": 1514
+      },
+      "Направление ветра, град": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1411
+      },
+      "Твердые осадки (%/час)": {
+        "offsetTypeId": 102,
+        "offsetValue": 0,
+        "variableId": 16034
+      },
+      "Фаза осадков (за час)": {
+        "offsetTypeId": 102,
+        "offsetValue": 0,
+        "variableId": 1023
+      }
+    }
+  },
+  "WRF 5": {
+    "id": 117,
+    "leadTimes": {
+      "0": {
+        "min": 0,
+        "max": 36,
+        "step": 1
+      },
+      "6": {
+        "min": 0,
+        "max": 36,
+        "step": 1
+      },
+      "12": {
+        "min": 0,
+        "max": 96,
+        "step": 1
+      }
+    },
+    "varoffs": {
+      "Скорость ветра, U-компонента, м/с": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1232
+      },
+      "Скорость ветра, V-компонента, м/с": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1419
+      },
+      "Скорость ветра, м/с": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1333
+      },
+      "Осадки (мм/час)": {
+        "offsetTypeId": 102,
+        "offsetValue": 0,
+        "variableId": 1250
+      },
+      "Температура воздуха, °C": {
+        "offsetTypeId": 100,
+        "offsetValue": 2,
+        "variableId": 1300
+      },
+      "Направление ветра, град": {
+        "offsetTypeId": 100,
+        "offsetValue": 10,
+        "variableId": 1411
+      }
+    }
+  },
+  "WaveWatch": {
+    "id": 200,
+    "leadTimes": {
+      "0": {
+        "min": 6,
+        "max": 72,
+        "step": 6
+      },
+      "6": {
+        "min": 6,
+        "max": 72,
+        "step": 6
+      }
+    },
+    "varoffs": {
+      "Волна смеш. - высота, м": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1279
+      },
+      "Волна ветровая - высота, м": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1271
+      },
+      "Волна ветровая - ср. период , сек": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1319
+      },
+      "Волна ветровая - направление, град": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1407
+      },
+      "Упругость водяного пара, гПа": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1276
+      },
+      "Волна зыбь - ср. период, сек": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1330
+      },
+      "Волна зыбь - направление, град": {
+        "offsetTypeId": 101,
+        "offsetValue": 0,
+        "variableId": 1376
+      }
+    }
+  }
+}

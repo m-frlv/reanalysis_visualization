@@ -1,0 +1,14 @@
+{
+  "region 1": {
+    "north": 49,
+    "south": 15,
+    "west": 120,
+    "east": 153
+  },
+  "region 2": {
+    "north": 75,
+    "south": 49,
+    "west": 120,
+    "east": 153
+  }
+}

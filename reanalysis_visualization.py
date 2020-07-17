@@ -24,15 +24,17 @@ archived hydrometeorological data
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction, QErrorMessage
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .reanalysis_visualization_dialog import ReanalysisVisualizationDialog
 from .isolines import Isolines
+from .data_grid import DataGrid
 import os.path
-from qgis.core import QgsVectorLayer, QgsProject, QgsProperty, QgsSymbolLayer, QgsPalLayerSettings, QgsVectorLayerSimpleLabeling
+from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer, QgsProject, QgsProperty, QgsSymbolLayer, QgsPalLayerSettings, QgsVectorLayerSimpleLabeling
+
 
 class ReanalysisVisualization:
     """QGIS Plugin Implementation."""
@@ -84,18 +86,17 @@ class ReanalysisVisualization:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('ReanalysisVisualization', message)
 
-
     def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
+            self,
+            icon_path,
+            text,
+            callback,
+            enabled_flag=True,
+            add_to_menu=True,
+            add_to_toolbar=True,
+            status_tip=None,
+            whats_this=None,
+            parent=None):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -172,7 +173,6 @@ class ReanalysisVisualization:
         # will be set False in run()
         self.first_start = True
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -190,17 +190,23 @@ class ReanalysisVisualization:
             self.first_start = False
             self.dlg = ReanalysisVisualizationDialog()
 
+        project = QgsProject.instance()
+        if not project.mapLayersByName('back'):
+            layer = QgsVectorLayer(
+                './background/ne_110m_admin_0_countries.shp', "back", "ogr")
+            project.addMapLayer(layer)
+
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            csv_path = self.dlg.mQgsFileWidget.filePath()
-            if (csv_path):
-                geojson = Isolines(csv_path).get_geojson()
+            params, variables, drawStyle = self.dlg.prepareFormData()
+            try:
+                data_grid = DataGrid(params, variables)
+                geojson = Isolines(data_grid, drawStyle).get_geojson()
                 layer = QgsVectorLayer(geojson, "mygeojson", "ogr")
-
                 # apply contour style properties
                 symbol_layer = layer.renderer().symbol().symbolLayers()[0]
                 symbol_layer.setDataDefinedProperty(
@@ -209,7 +215,6 @@ class ReanalysisVisualization:
                     QgsSymbolLayer.PropertyFillColor, QgsProperty.fromField("fill"))
                 symbol_layer.setDataDefinedProperty(
                     QgsSymbolLayer.PropertyStrokeWidth, QgsProperty.fromField("stroke-width"))
-
 
                 # add labels
                 pal_layer = QgsPalLayerSettings()
@@ -225,3 +230,13 @@ class ReanalysisVisualization:
 
                 # add vector layer with isolines
                 QgsProject.instance().addMapLayer(layer)
+            except Exception:
+                error_text = ''
+
+                if (params['east'] > 180 or params['east'] < -180 or params['west'] > 180 or params['west'] < -180 or params['south'] > 90 or params['south'] < -90 or params['north'] > 90 or params['north'] < -90):
+                    error_text += "Ошибка: Некорректно заданы координаты области"
+                else:
+                    error_text += "Cерверная ошибка"
+                error_dialog = QErrorMessage()
+                error_dialog.showMessage(error_text)
+                error_dialog.exec_()
