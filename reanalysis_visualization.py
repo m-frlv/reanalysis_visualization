@@ -262,7 +262,7 @@ class ReanalysisVisualization:
                 if (params['east'] > 180 or params['east'] < -180 or params['west'] > 180 or params['west'] < -180 or params['south'] > 90 or params['south'] < -90 or params['north'] > 90 or params['north'] < -90):
                     error_text += "Ошибка: Некорректно заданы координаты области"
                 else:
-                    error_text += "Cерверная ошибка\n" + str(e)
+                    error_text += "Ошибка: \n" + str(e)
                 error_dialog = QErrorMessage()
                 error_dialog.showMessage(error_text)
                 error_dialog.exec_()

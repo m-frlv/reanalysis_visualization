@@ -19,8 +19,11 @@ class DataGrid:
         response = requests.post(
             url, params=self.params, json=self.variables)
         response.raise_for_status()
-
-        return response.json()
+        try:
+            json = response.json()
+            return json
+        except Exception:
+            raise Exception("Can't parse response json")
 
     def __prepare_data(self, response):
         data_grids = []
