@@ -11,8 +11,8 @@ class DataGrid:
         self.variables = variables
         self.__prepare_data(self.__query())
 
-    def get_data_grid(self):
-        return self.X, self.Y, self.Z
+    def get_data_grids(self):
+        return self.data_grids
 
     def __query(self):
         url = 'http://92.50.219.104:8503/api/NWP/region'
@@ -23,25 +23,39 @@ class DataGrid:
         return response.json()
 
     def __prepare_data(self, response):
-        data = {
-            'lat': [],
-            'lon': [],
-            'val': []
-        }
+        data_grids = []
 
-        for row in response:
-            if not np.isnan(float(row['values'][0][0])):
-                data['lat'].append(row['latGrd'])
-                data['lon'].append(row['lonGrd'])
-                data['val'].append(row['values'][0][0])
+        i = 0
 
-        data = pd.DataFrame(data)
-        self.Z = data.pivot_table(
-            index='lon', columns='lat', values='val').T.values
+        for lead_time in self.params['leadTimes']:
+            data = {
+                'lat': [],
+                'lon': [],
+                'val': []
+            }
 
-        sigma = 1
-        self.Z = gaussian_filter(self.Z, sigma)
-        X = np.sort(data.lon.unique())
-        Y = np.sort(data.lat.unique())
+            for row in response:
+                if not np.isnan(float(row['values'][0][0])):
+                    data['lat'].append(row['latGrd'])
+                    data['lon'].append(row['lonGrd'])
+                    data['val'].append(row['values'][i][0])
 
-        self.X, self.Y = np.meshgrid(X, Y)
+            i += 1
+
+            data = pd.DataFrame(data)
+            Z = data.pivot_table(
+                index='lon', columns='lat', values='val').T.values
+
+            sigma = 1
+            Z = gaussian_filter(Z, sigma)
+            X = np.sort(data.lon.unique())
+            Y = np.sort(data.lat.unique())
+
+            data_grids.append({
+                'X': X,
+                'Y': Y,
+                'Z': Z,
+                'leadTime': lead_time
+            })
+
+        self.data_grids = data_grids

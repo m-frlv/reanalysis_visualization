@@ -205,38 +205,41 @@ class ReanalysisVisualization:
             params, variables, drawStyle = self.dlg.prepareFormData()
             try:
                 data_grid = DataGrid(params, variables)
-                geojson = Isolines(data_grid, drawStyle).get_geojson()
-                layer = QgsVectorLayer(geojson, "mygeojson", "ogr")
-                # apply contour style properties
-                symbol_layer = layer.renderer().symbol().symbolLayers()[0]
-                symbol_layer.setDataDefinedProperty(
-                    QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("stroke"))
-                symbol_layer.setDataDefinedProperty(
-                    QgsSymbolLayer.PropertyFillColor, QgsProperty.fromField("fill"))
-                symbol_layer.setDataDefinedProperty(
-                    QgsSymbolLayer.PropertyStrokeWidth, QgsProperty.fromField("stroke-width"))
+                geojsons = Isolines(data_grid, drawStyle).get_geojsons()
 
-                # add labels
-                pal_layer = QgsPalLayerSettings()
-                pal_layer.fieldName = 'title'
-                pal_layer.enabled = True
-                pal_layer.placement = QgsPalLayerSettings.PerimeterCurved
-                pal_layer.placementFlags = QgsPalLayerSettings.OnLine
+                for geojson in geojsons:
+                    layer = QgsVectorLayer(
+                        geojson['geojson'], "leadTime = " + str(geojson['leadTime']), "ogr")
+                    # apply contour style properties
+                    symbol_layer = layer.renderer().symbol().symbolLayers()[0]
+                    symbol_layer.setDataDefinedProperty(
+                        QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("stroke"))
+                    symbol_layer.setDataDefinedProperty(
+                        QgsSymbolLayer.PropertyFillColor, QgsProperty.fromField("fill"))
+                    symbol_layer.setDataDefinedProperty(
+                        QgsSymbolLayer.PropertyStrokeWidth, QgsProperty.fromField("stroke-width"))
 
-                labeler = QgsVectorLayerSimpleLabeling(pal_layer)
+                    # add labels
+                    pal_layer = QgsPalLayerSettings()
+                    pal_layer.fieldName = 'title'
+                    pal_layer.enabled = True
+                    pal_layer.placement = QgsPalLayerSettings.PerimeterCurved
+                    pal_layer.placementFlags = QgsPalLayerSettings.OnLine
 
-                layer.setLabeling(labeler)
-                layer.setLabelsEnabled(True)
+                    labeler = QgsVectorLayerSimpleLabeling(pal_layer)
 
-                # add vector layer with isolines
-                QgsProject.instance().addMapLayer(layer)
-            except Exception:
+                    layer.setLabeling(labeler)
+                    layer.setLabelsEnabled(True)
+
+                    # add vector layer with isolines
+                    QgsProject.instance().addMapLayer(layer)
+            except Exception as e:
                 error_text = ''
 
                 if (params['east'] > 180 or params['east'] < -180 or params['west'] > 180 or params['west'] < -180 or params['south'] > 90 or params['south'] < -90 or params['north'] > 90 or params['north'] < -90):
                     error_text += "Ошибка: Некорректно заданы координаты области"
                 else:
-                    error_text += "Cерверная ошибка"
+                    error_text += "Cерверная ошибка\n" + str(e)
                 error_dialog = QErrorMessage()
                 error_dialog.showMessage(error_text)
                 error_dialog.exec_()
