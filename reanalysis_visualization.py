@@ -24,7 +24,7 @@ archived hydrometeorological data
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QErrorMessage
+from qgis.PyQt.QtWidgets import QAction, QErrorMessage, QMessageBox
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -185,6 +185,9 @@ class ReanalysisVisualization:
 
     def __change_active_layer(self, group):
         for i in range(len(group.findLayerIds())):
+            msg = QMessageBox()
+            msg.setText(str(i)+' / ' + str(len(group.findLayerIds())))
+            msg.show()
             group.setIsMutuallyExclusive(True, i)
             time.sleep(5)
 
@@ -209,7 +212,7 @@ class ReanalysisVisualization:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            params, variables, drawStyle = self.dlg.prepare_form_data()
+            params, variables, drawStyle, need_slideshow = self.dlg.prepare_form_data()
             try:
                 root = QgsProject.instance().layerTreeRoot()
 
@@ -253,9 +256,10 @@ class ReanalysisVisualization:
                     QgsProject.instance().addMapLayer(layer, False)
                     group.insertChildNode(-1, QgsLayerTreeLayer(layer))
                 group.setIsMutuallyExclusive(True, 0)
-                slideshow = threading.Thread(
-                    target=self.__change_active_layer, args=(group,))
-                slideshow.start()
+                if need_slideshow:
+                    slideshow = threading.Thread(
+                        target=self.__change_active_layer, args=(group,))
+                    slideshow.start()
             except Exception as e:
                 error_text = ''
 

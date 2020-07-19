@@ -12,7 +12,7 @@ import sys
 from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit,
                              QTextEdit, QGridLayout, QApplication,
                              QComboBox, QGroupBox, QStackedWidget, QDateEdit,
-                             QSpinBox, QDialogButtonBox, QListView, QPushButton)
+                             QSpinBox, QDialogButtonBox, QListView, QPushButton, QCheckBox)
 
 from PyQt5.QtCore import QDate
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
@@ -91,7 +91,9 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
         variables = [self.__data_models[self.models.currentText()]
                      ['varoffs'][parameter]]
 
-        return params, variables, draw_style
+        slideshow = self.slideshow.checkState()
+
+        return params, variables, draw_style, slideshow
 
     def initUI(self):
         self.draw_style = QComboBox(self)
@@ -136,6 +138,8 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
         self.lead_time_list_box = LeadTimeListBox(
             self.__get_lead_times(self.models.currentText()))
 
+        self.slideshow = QCheckBox('Показать слайд-шоу', self)
+
         grid = QGridLayout()
         grid.setSpacing(10)
 
@@ -162,7 +166,8 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
         grid.addWidget(self.region_picker, 8, 0, 1, 2)
         self.region_picker.hide()
 
-        grid.addWidget(self.button_box, 9, 0, 1, 2)
+        grid.addWidget(self.slideshow, 9, 0, 1, 2)
+        grid.addWidget(self.button_box, 10, 0, 1, 2)
 
         self.setLayout(grid)
 
