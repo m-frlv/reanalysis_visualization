@@ -20,67 +20,67 @@ import json
 class RegionPicker(QStackedWidget):
     def __init__(self):
         super().__init__()
-        self._loadPreparedRegionsData()
-        self._addRegionPickers()
+        self.__load_prepared_regions_data()
+        self.__add_region_pickers()
 
-    def _loadPreparedRegionsData(self):
+    def __load_prepared_regions_data(self):
         f = open('regions.json')
-        self.preparedRegionsData = json.load(f)
+        self.prepared_regions_data = json.load(f)
 
-    def _transformCrs(self, extent):
-        crsSrc = QgsProject.instance().crs()
-        crsDest = QgsCoordinateReferenceSystem(4326)
-        return QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance()).transformBoundingBox(extent)
+    def __transform_crs(self, extent):
+        crs_src = QgsProject.instance().crs()
+        crs_dest = QgsCoordinateReferenceSystem(4326)
+        return QgsCoordinateTransform(crs_src, crs_dest, QgsProject.instance()).transformBoundingBox(extent)
 
-    def _addRegionPickers(self):
-        self.regionManual = QGroupBox()
+    def __add_region_pickers(self):
+        self.region_manual = QGroupBox()
         grid = QGridLayout()
 
-        northLabel = QLabel('Север')
-        southLabel = QLabel('Юг')
-        westLabel = QLabel('Запад')
-        eastLabel = QLabel('Восток')
+        north_label = QLabel('Север')
+        south_label = QLabel('Юг')
+        west_label = QLabel('Запад')
+        east_label = QLabel('Восток')
 
-        northInput = QSpinBox(self)
-        southInput = QSpinBox(self)
-        westInput = QSpinBox(self)
-        eastInput = QSpinBox(self)
+        north_input = QSpinBox(self)
+        south_input = QSpinBox(self)
+        west_nput = QSpinBox(self)
+        east_input = QSpinBox(self)
 
-        grid.addWidget(northLabel, 1, 1)
-        grid.addWidget(southLabel, 5, 1)
-        grid.addWidget(westLabel, 3, 0)
-        grid.addWidget(eastLabel, 3, 2)
+        grid.addWidget(north_label, 1, 1)
+        grid.addWidget(south_label, 5, 1)
+        grid.addWidget(west_label, 3, 0)
+        grid.addWidget(east_label, 3, 2)
 
-        northInput.setRange(-90, 90)
-        southInput.setRange(-90, 90)
-        westInput.setRange(-180, 180)
-        eastInput.setRange(-180, 180)
+        north_input.setRange(-90, 90)
+        south_input.setRange(-90, 90)
+        west_nput.setRange(-180, 180)
+        east_input.setRange(-180, 180)
 
-        grid.addWidget(northInput, 2, 1)
-        grid.addWidget(southInput, 6, 1)
-        grid.addWidget(westInput, 4, 0)
-        grid.addWidget(eastInput, 4, 2)
+        grid.addWidget(north_input, 2, 1)
+        grid.addWidget(south_input, 6, 1)
+        grid.addWidget(west_nput, 4, 0)
+        grid.addWidget(east_input, 4, 2)
 
-        self.regionManual.setLayout(grid)
-        self.regionPrepared = QComboBox(self)
-        self.regionPrepared.addItems(self.preparedRegionsData.keys())
-        self.addWidget(self.regionManual)
-        self.addWidget(self.regionPrepared)
+        self.region_manual.setLayout(grid)
+        self.region_prepared = QComboBox(self)
+        self.region_prepared.addItems(self.prepared_regions_data.keys())
+        self.addWidget(self.region_manual)
+        self.addWidget(self.region_prepared)
 
-    def getRegion(self, type):
+    def get_region(self, type):
         if type == 'Задать границы вручную':
             return {
-                'north': self.regionManual.layout().itemAtPosition(2, 1).widget().value(),
-                'south': self.regionManual.layout().itemAtPosition(6, 1).widget().value(),
-                'west': self.regionManual.layout().itemAtPosition(4, 0).widget().value(),
-                'east': self.regionManual.layout().itemAtPosition(4, 2).widget().value()
+                'north': self.region_manual.layout().itemAtPosition(2, 1).widget().value(),
+                'south': self.region_manual.layout().itemAtPosition(6, 1).widget().value(),
+                'west': self.region_manual.layout().itemAtPosition(4, 0).widget().value(),
+                'east': self.region_manual.layout().itemAtPosition(4, 2).widget().value()
             }
 
         elif type == 'Подготовленные регионы':
-            return self.preparedRegionsData[self.regionPrepared.currentText()]
+            return self.prepared_regions_data[self.region_prepared.currentText()]
         else:
             extent = iface.mapCanvas().extent()
-            extent = self._transformCrs(extent)
+            extent = self.__transform_crs(extent)
             return {
                 'east': extent.xMaximum(),
                 'west': extent.xMinimum(),

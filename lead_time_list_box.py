@@ -18,49 +18,49 @@ import json
 
 
 class LeadTimeListBox(QGroupBox):
-    def __init__(self, allowedLeadTimes):
+    def __init__(self, allowed_lead_times):
         super().__init__()
-        self.allowedLeadTimes = allowedLeadTimes
+        self.allowed_lead_times = allowed_lead_times
 
-        self.leadTimeList = QListView()
-        self.model = QStandardItemModel(self.leadTimeList)
-        self.leadTimeList.setModel(self.model)
-        self.leadTimeInput = QSpinBox()
+        self.lead_time_list = QListView()
+        self.model = QStandardItemModel(self.lead_time_list)
+        self.lead_time_list.setModel(self.model)
+        self.lead_time_input = QSpinBox()
 
-        self.leadTimeInput.setRange(
-            allowedLeadTimes['min'], allowedLeadTimes['max'])
-        self.leadTimeInput.setSingleStep(allowedLeadTimes['step'])
-        self.leadTimeInput.valueChanged.connect(
-            self._roundValueBetweenStep)
-        self.addLeadTimeButton = QPushButton("+", self)
-        self.addLeadTimeButton.clicked.connect(self.addLeadTime)
-        self.deleteLeadTimeButton = QPushButton("-", self)
-        self.deleteLeadTimeButton.clicked.connect(self.deleteLeadTime)
+        self.lead_time_input.setRange(
+            allowed_lead_times['min'], allowed_lead_times['max'])
+        self.lead_time_input.setSingleStep(allowed_lead_times['step'])
+        self.lead_time_input.valueChanged.connect(
+            self.__round_value_between_step)
+        self.add_lead_time_button = QPushButton("+", self)
+        self.add_lead_time_button.clicked.connect(self.__add_lead_time)
+        self.delete_lead_time_button = QPushButton("-", self)
+        self.delete_lead_time_button.clicked.connect(self.__delete_lead_time)
 
         grid = QGridLayout()
-        grid.addWidget(self.leadTimeInput, 0, 0, 1, 2)
-        grid.addWidget(self.addLeadTimeButton, 1, 0)
-        grid.addWidget(self.deleteLeadTimeButton, 1, 1)
-        grid.addWidget(self.leadTimeList, 2, 0, 1, 2)
+        grid.addWidget(self.lead_time_input, 0, 0, 1, 2)
+        grid.addWidget(self.add_lead_time_button, 1, 0)
+        grid.addWidget(self.delete_lead_time_button, 1, 1)
+        grid.addWidget(self.lead_time_list, 2, 0, 1, 2)
         self.setLayout(grid)
 
-    def addLeadTime(self):
-        leadTime = self.leadTimeInput.value()
-        item = QStandardItem(str(leadTime))
+    def __add_lead_time(self):
+        lead_time = self.lead_time_input.value()
+        item = QStandardItem(str(lead_time))
         self.model.appendRow(item)
 
-    def deleteLeadTime(self):
-        indexes = self.leadTimeList.selectionModel().selectedIndexes()
+    def __delete_lead_time(self):
+        indexes = self.lead_time_list.selectionModel().selectedIndexes()
         for i in indexes:
             self.model.removeRow(i.row())
 
-    def _roundValueBetweenStep(self, value):
-        self.leadTimeInput.setValue(
-            (value // self.allowedLeadTimes['step'] * self.allowedLeadTimes['step']))
+    def __round_value_between_step(self, value):
+        self.lead_time_input.setValue(
+            (value // self.allowed_lead_times['step'] * self.allowed_lead_times['step']))
 
-    def getValues(self):
-        leadTimes = []
+    def get_values(self):
+        lead_times = []
         for index in range(self.model.rowCount()):
             item = self.model.item(index)
-            leadTimes.append(int(item.text()))
-        return leadTimes
+            lead_times.append(int(item.text()))
+        return lead_times

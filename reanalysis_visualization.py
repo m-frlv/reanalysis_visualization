@@ -209,7 +209,7 @@ class ReanalysisVisualization:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            params, variables, drawStyle = self.dlg.prepareFormData()
+            params, variables, drawStyle = self.dlg.prepare_form_data()
             try:
                 root = QgsProject.instance().layerTreeRoot()
 

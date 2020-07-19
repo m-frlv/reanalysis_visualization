@@ -23,145 +23,146 @@ import json
 class ReanalysisVisualizationDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
-        self._loadDataModels()
+        self.__load_data_models()
         self.initUI()
 
-    def _onModelsChecked(self, text):
+    def __on_models_checked(self, text):
         self.layout().removeWidget(self.parameters)
         self.layout().removeWidget(self.time)
 
         self.parameters.deleteLater()
         self.parameters = QComboBox(self)
-        self.parameters.addItems(self._getVariables(text))
+        self.parameters.addItems(self.__get_variables(text))
         self.time.deleteLater()
         self.time = QComboBox(self)
-        self.time.addItems(self._getTimes(text))
-        self.time.activated[str].connect(self._onTimeChecked)
+        self.time.addItems(self.__get_times(text))
+        self.time.activated[str].connect(self.__on_time_checked)
 
-        self._onTimeChecked(self._onTimeChecked)
+        self.__on_time_checked(self.__on_time_checked)
         self.layout().addWidget(self.parameters, 3, 1)
         self.layout().addWidget(self.time, 5, 1)
 
-    def _onTimeChecked(self, text):
-        self.layout().removeWidget(self.leadTimeListBox)
-        self.leadTimeListBox = LeadTimeListBox(
-            self._getLeadTimes(self.models.currentText()))
-        self.layout().addWidget(self.leadTimeListBox, 6, 1)
+    def __on_time_checked(self, text):
+        self.layout().removeWidget(self.lead_time_list_box)
+        self.lead_time_list_box = LeadTimeListBox(
+            self.__get_lead_times(self.models.currentText()))
+        self.layout().addWidget(self.lead_time_list_box, 6, 1)
 
-    def _loadDataModels(self):
+    def __load_data_models(self):
         f = open('method_x_varoffs.json')
-        self._dataModels = json.load(f)
+        self.__data_models = json.load(f)
 
-    def _getVariables(self, model):
-        return self._dataModels[model]['varoffs'].keys()
+    def __get_variables(self, model):
+        return self.__data_models[model]['varoffs'].keys()
 
-    def _getTimes(self, model):
-        return self._dataModels[model]['leadTimes'].keys()
+    def __get_times(self, model):
+        return self.__data_models[model]['leadTimes'].keys()
 
-    def _getLeadTimes(self, model):
-        return self._dataModels[model]['leadTimes'][self.time.currentText()]
+    def __get_lead_times(self, model):
+        return self.__data_models[model]['leadTimes'][self.time.currentText()]
 
-    def _onRegionTypeChecked(self):
-        type = self.regionType.currentText()
+    def __on_region_type_checked(self):
+        type = self.region_type.currentText()
         if type == 'Задать границы вручную':
-            self.regionPicker.setCurrentIndex(0)
-            self.regionPicker.show()
+            self.region_picker.setCurrentIndex(0)
+            self.region_picker.show()
         elif type == 'Подготовленные регионы':
-            self.regionPicker.setCurrentIndex(1)
-            self.regionPicker.regionPrepared.setFixedHeight(
+            self.region_picker.setCurrentIndex(1)
+            self.region_picker.region_prepared.setFixedHeight(
                 self.models.frameGeometry().height())
-            self.regionPicker.show()
+            self.region_picker.show()
         else:
-            self.regionPicker.hide()
+            self.region_picker.hide()
 
     def accept(self):
         self.done(1)
 
-    def prepareFormData(self):
-        drawStyle = self.drawStyle.currentText()
-        model = self._dataModels[self.models.currentText()]['id']
+    def prepare_form_data(self):
+        draw_style = self.draw_style.currentText()
+        model = self.__data_models[self.models.currentText()]['id']
         parameter = self.parameters.currentText()
 
-        params = self.regionPicker.getRegion(self.regionType.currentText())
-        params['dateIni'] = self.dayIni.date().toString(
+        params = self.region_picker.get_region(self.region_type.currentText())
+        params['dateIni'] = self.day_ini.date().toString(
             'yyyy-MM-dd') + 'T' + self.time.currentText().zfill(2) + ':00'
-        params['leadTimes'] = self.leadTimeListBox.getValues()
+        params['leadTimes'] = self.lead_time_list_box.get_values()
         params['methodId'] = model
 
-        variables = [self._dataModels[self.models.currentText()]
+        variables = [self.__data_models[self.models.currentText()]
                      ['varoffs'][parameter]]
 
-        return params, variables, drawStyle
+        return params, variables, draw_style
 
     def initUI(self):
-        self.drawStyle = QComboBox(self)
-        self.drawStyleLabel = QLabel('Cтиль отрисовки')
-        self.drawStyle.addItems(
+        self.draw_style = QComboBox(self)
+        self.draw_style_label = QLabel('Cтиль отрисовки')
+        self.draw_style.addItems(
             ['Изолинии', 'Контур с подписями'])
 
-        self.modelsLabel = QLabel('Модель')
+        self.models_label = QLabel('Модель')
         self.models = QComboBox(self)
-        self.models.addItems(self._dataModels.keys())
-        self.models.activated[str].connect(self._onModelsChecked)
+        self.models.addItems(self.__data_models.keys())
+        self.models.activated[str].connect(self.__on_models_checked)
 
-        self.parametersLabel = QLabel('Параметр')
+        self.parameters_label = QLabel('Параметр')
         self.parameters = QComboBox(self)
-        self.parameters.addItems(self._getVariables(self.models.currentText()))
+        self.parameters.addItems(
+            self.__get_variables(self.models.currentText()))
 
-        self.dayIni = QDateEdit(self)
-        self.dayIni.setCalendarPopup(True)
-        self.dayIni.setDate(QDate.currentDate().addDays(-1))
-        self.dayIniLabel = QLabel('Дата')
+        self.day_ini = QDateEdit(self)
+        self.day_ini.setCalendarPopup(True)
+        self.day_ini.setDate(QDate.currentDate().addDays(-1))
+        self.day_ini_label = QLabel('Дата')
 
         self.time = QComboBox(self)
-        self.timeLabel = QLabel('Время')
-        self.time.addItems(self._getTimes(self.models.currentText()))
-        self.time.activated[str].connect(self._onTimeChecked)
+        self.time_label = QLabel('Время')
+        self.time.addItems(self.__get_times(self.models.currentText()))
+        self.time.activated[str].connect(self.__on_time_checked)
 
-        self.regionTypeLabel = QLabel('Регион')
-        self.regionType = QComboBox(self)
-        self.regionType.addItems(
+        self.region_type_label = QLabel('Регион')
+        self.region_type = QComboBox(self)
+        self.region_type.addItems(
             ['Видимая область', 'Задать границы вручную', 'Подготовленные регионы'])
-        self.regionType.activated[str].connect(self._onRegionTypeChecked)
+        self.region_type.activated[str].connect(self.__on_region_type_checked)
 
-        self.regionPicker = RegionPicker()
+        self.region_picker = RegionPicker()
 
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok
-                                          | QDialogButtonBox.Cancel)
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok
+                                           | QDialogButtonBox.Cancel)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
 
-        self.leadTimeLabel = QLabel('Заблаговременность')
-        self.leadTimeListBox = LeadTimeListBox(
-            self._getLeadTimes(self.models.currentText()))
+        self.lead_time_label = QLabel('Заблаговременность')
+        self.lead_time_list_box = LeadTimeListBox(
+            self.__get_lead_times(self.models.currentText()))
 
         grid = QGridLayout()
         grid.setSpacing(10)
 
-        grid.addWidget(self.drawStyleLabel, 1, 0)
-        grid.addWidget(self.drawStyle, 1, 1)
+        grid.addWidget(self.draw_style_label, 1, 0)
+        grid.addWidget(self.draw_style, 1, 1)
 
-        grid.addWidget(self.modelsLabel, 2, 0)
+        grid.addWidget(self.models_label, 2, 0)
         grid.addWidget(self.models, 2, 1)
 
-        grid.addWidget(self.parametersLabel, 3, 0)
+        grid.addWidget(self.parameters_label, 3, 0)
         grid.addWidget(self.parameters, 3, 1)
 
-        grid.addWidget(self.dayIniLabel, 4, 0)
-        grid.addWidget(self.dayIni, 4, 1)
+        grid.addWidget(self.day_ini_label, 4, 0)
+        grid.addWidget(self.day_ini, 4, 1)
 
-        grid.addWidget(self.timeLabel, 5, 0)
+        grid.addWidget(self.time_label, 5, 0)
         grid.addWidget(self.time, 5, 1)
 
-        grid.addWidget(self.leadTimeLabel, 6, 0)
-        grid.addWidget(self.leadTimeListBox, 6, 1)
+        grid.addWidget(self.lead_time_label, 6, 0)
+        grid.addWidget(self.lead_time_list_box, 6, 1)
 
-        grid.addWidget(self.regionTypeLabel, 7, 0)
-        grid.addWidget(self.regionType, 7, 1)
-        grid.addWidget(self.regionPicker, 8, 0, 1, 2)
-        self.regionPicker.hide()
+        grid.addWidget(self.region_type_label, 7, 0)
+        grid.addWidget(self.region_type, 7, 1)
+        grid.addWidget(self.region_picker, 8, 0, 1, 2)
+        self.region_picker.hide()
 
-        grid.addWidget(self.buttonBox, 9, 0, 1, 2)
+        grid.addWidget(self.button_box, 9, 0, 1, 2)
 
         self.setLayout(grid)
 
