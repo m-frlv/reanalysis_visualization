@@ -34,6 +34,8 @@ from .isolines import Isolines
 from .data_grid import DataGrid
 import os.path
 from qgis.core import QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer, QgsProject, QgsProperty, QgsSymbolLayer, QgsPalLayerSettings, QgsVectorLayerSimpleLabeling
+import time
+import threading
 
 
 class ReanalysisVisualization:
@@ -181,6 +183,11 @@ class ReanalysisVisualization:
                 action)
             self.iface.removeToolBarIcon(action)
 
+    def __change_active_layer(self, group):
+        for i in range(len(group.findLayerIds())):
+            group.setIsMutuallyExclusive(True, i)
+            time.sleep(5)
+
     def run(self):
         """Run method that performs all the real work"""
 
@@ -246,6 +253,9 @@ class ReanalysisVisualization:
                     QgsProject.instance().addMapLayer(layer, False)
                     group.insertChildNode(-1, QgsLayerTreeLayer(layer))
                 group.setIsMutuallyExclusive(True, 0)
+                slideshow = threading.Thread(
+                    target=self.__change_active_layer, args=(group,))
+                slideshow.start()
             except Exception as e:
                 error_text = ''
 
