@@ -231,6 +231,7 @@ class ReanalysisVisualization:
                 for geojson in geojsons:
                     layer = QgsVectorLayer(
                         geojson['geojson'], "leadTime = " + str(geojson['leadTime']), "ogr")
+                    layer.setOpacity(0.87)
                     # apply contour style properties
                     symbol_layer = layer.renderer().symbol().symbolLayers()[0]
                     symbol_layer.setDataDefinedProperty(
