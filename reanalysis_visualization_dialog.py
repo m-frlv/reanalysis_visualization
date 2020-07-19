@@ -6,6 +6,7 @@ from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.utils import iface
 from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from .lead_time_list_box import LeadTimeListBox
 
 import sys
 from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit,
@@ -44,7 +45,8 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
 
     def _onTimeChecked(self, text):
         self.layout().removeWidget(self.leadTimeListBox)
-        self._addLeadTimeListView()
+        self.leadTimeListBox = LeadTimeListBox(
+            self._getLeadTimes(self.models.currentText()))
         self.layout().addWidget(self.leadTimeListBox, 6, 1)
         self._getRegion()
 
@@ -86,10 +88,6 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
                 'north': extent.yMaximum(),
                 'south': extent.yMinimum(),
             }
-
-    def _roundValueBetweenStep(self, value):
-        self.leadTimeInput.setValue((value // self._getLeadTimes(self.models.currentText())
-                                     ['step'] * self._getLeadTimes(self.models.currentText())['step']))
 
     def _onRegionTypeChecked(self):
         type = self.regionType.currentText()
@@ -141,42 +139,6 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
     def accept(self):
         self.done(1)
 
-    def _addLeadTimeListView(self):
-        self.leadTimeList = QListView()
-
-        self.leadTimeListModel = QStandardItemModel(self.leadTimeList)
-        self.leadTimeList.setModel(self.leadTimeListModel)
-
-        self.leadTimeListBox = QGroupBox()
-        self.leadTimeInput = QSpinBox()
-        allowedLeadTimes = self._getLeadTimes(self.models.currentText())
-        self.leadTimeInput.setRange(
-            allowedLeadTimes['min'], allowedLeadTimes['max'])
-        self.leadTimeInput.setSingleStep(allowedLeadTimes['step'])
-        self.leadTimeInput.valueChanged.connect(
-            self._roundValueBetweenStep)
-        self.addLeadTimeButton = QPushButton("+", self)
-        self.addLeadTimeButton.clicked.connect(self.addLeadTime)
-        self.deleteLeadTimeButton = QPushButton("-", self)
-        self.deleteLeadTimeButton.clicked.connect(self.deleteLeadTime)
-
-        grid = QGridLayout()
-        grid.addWidget(self.leadTimeInput, 0, 0, 1, 2)
-        grid.addWidget(self.addLeadTimeButton, 1, 0)
-        grid.addWidget(self.deleteLeadTimeButton, 1, 1)
-        grid.addWidget(self.leadTimeList, 2, 0, 1, 2)
-        self.leadTimeListBox.setLayout(grid)
-
-    def addLeadTime(self):
-        leadTime = self.leadTimeInput.value()
-        item = QStandardItem(str(leadTime))
-        self.leadTimeListModel.appendRow(item)
-
-    def deleteLeadTime(self):
-        indexes = self.leadTimeList.selectionModel().selectedIndexes()
-        for i in indexes:
-            self.leadTimeListModel.removeRow(i.row())
-
     def _transformCrs(self, extent):
         crsSrc = QgsProject.instance().crs()
         crsDest = QgsCoordinateReferenceSystem(4326)
@@ -186,18 +148,14 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
         drawStyle = self.drawStyle.currentText()
         model = self._dataModels[self.models.currentText()]['id']
         parameter = self.parameters.currentText()
-        leadTimes = []
 
-        for index in range(self.leadTimeListModel.rowCount()):
-            item = self.leadTimeListModel.item(index)
-            leadTimes.append(int(item.text()))
         extent = iface.mapCanvas().extent()
         extent = self._transformCrs(extent)
 
         params = self._getRegion()
         params['dateIni'] = self.dayIni.date().toString(
             'yyyy-MM-dd') + 'T' + self.time.currentText().zfill(2) + ':00'
-        params['leadTimes'] = leadTimes
+        params['leadTimes'] = self.leadTimeListBox.getValues()
         params['methodId'] = model
 
         variables = [self._dataModels[self.models.currentText()]
@@ -247,7 +205,8 @@ class ReanalysisVisualizationDialog(QtWidgets.QDialog):
         self.buttonBox.rejected.connect(self.reject)
 
         self.leadTimeLabel = QLabel('Заблаговременность')
-        self._addLeadTimeListView()
+        self.leadTimeListBox = LeadTimeListBox(
+            self._getLeadTimes(self.models.currentText()))
 
         grid = QGridLayout()
         grid.setSpacing(10)
