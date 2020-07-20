@@ -1,7 +1,7 @@
 ## Начало работы
 
 ### Установить зависимости
-Открыть в QGis консоль Python, ввести
+Открыть в QGis 3 консоль Python, ввести
 
 ```
 subprocess.check_call([sys.executable, "-m", "pip", "install",  'pandas', 'scipy', 'geojsoncontour'])
@@ -27,6 +27,6 @@ https://github.com/shtirlets96/reanalysis_visualization/archive/master.zip
 
 
 #### Далее для обоих способов
-1) открыть QGis
+1) открыть QGis 3
 2) вкладка Модули => Управление и установка модулей
 3) сделать модуль активным
